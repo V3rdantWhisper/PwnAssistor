@@ -2,5 +2,6 @@ __all__ = [
     'fmt',
     'gadget',
     'io',
-    'stack'
+    'stack',
+    'pwnvar'
 ]
