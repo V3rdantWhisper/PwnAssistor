@@ -1,0 +1,2 @@
+PwnAssistor~=0.1
+setuptools~=65.5.1

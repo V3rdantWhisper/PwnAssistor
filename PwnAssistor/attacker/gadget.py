@@ -1,38 +1,40 @@
-import subprocess
+from pwn import asm
+from pwnvar import pwnlibc
 
 
-class Gadget:
-    def __init__(self, libc_path: str):
-        self.libc_path = libc_path
+def get_magic_gadget1():
+    return pwnlibc.search(
+        asm("mov rdx, qword ptr [rdi + 8]; mov qword ptr [rsp], rax; call qword ptr [rdx + 0x20]",
+            arch="amd64")).__next__()
 
-    def __get_gadget_by_opcode(self, opcode: str):
-        out_ = subprocess.check_output(["ROPgadget", "--binary", self.libc_path, "--opcode", opcode]) \
-            .decode('utf-8', errors='ignore').splitlines()[2:][0]
 
-        if out_ is None:
-            raise Exception("No gadget found")
+def get_magic_gadget2():
+    return pwnlibc.search(asm("mov rsp, rdx; ret", arch="amd64")).__next__()
 
-        gadget_addr = int(out_.split(":")[0], 16)
 
-        return gadget_addr
+def get_magic_gadget3():
+    return pwnlibc.search(asm('add rsp, 0x30; mov rax, r12; pop r12; ret', arch="amd64")).__next__()
 
-    def get_magic_gadget(self):
-        return self.__get_gadget_by_opcode("488b570848890424ff5220")
 
-    def get_pop_rdi(self):
-        return self.__get_gadget_by_opcode("5fc3")
+def get_pop_rdi():
+    return pwnlibc.search(asm("pop rdi; ret", arch="amd64")).__next__()
 
-    def get_pop_rsi(self):
-        return self.__get_gadget_by_opcode("5ec3")
 
-    def get_pop_rax(self):
-        return self.__get_gadget_by_opcode("58c3")
+def get_pop_rsi():
+    return pwnlibc.search(asm("pop rsi; ret", arch="amd64")).__next__()
 
-    def get_ret(self):
-        return self.__get_gadget_by_opcode("c3")
 
-    def get_pop_rdx_r12(self):
-        return self.__get_gadget_by_opcode("5a415cc3")
+def get_pop_rax():
+    return pwnlibc.search(asm("pop rax; ret", arch="amd64")).__next__()
 
-    def get_syscall(self):
-        return self.__get_gadget_by_opcode("0f05c3")
+
+def get_ret():
+    return pwnlibc.search(asm("ret", arch="amd64")).__next__()
+
+
+def get_pop_rdx_r12():
+    return pwnlibc.search(asm("mov rdx, r12; pop r12; ret", arch="amd64")).__next__()
+
+
+def get_syscall():
+    return pwnlibc.search(asm("syscall; ret", arch="amd64")).__next__()
