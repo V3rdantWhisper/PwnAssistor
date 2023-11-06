@@ -37,11 +37,11 @@ def fmt_64_write(input_offset: int,
                  is_zxt: bool = False,
                  zxt_len: int = 8):
     """
-    | input_offset:  the offset of input fmt str
-    | target_addr:   the address to write
-    | target_num:    the value to write
-    | is_zxt:        zero extension or not
-    | zxt_len:       zero extension to 'zxt_len' bit
+    :param input_offset:  the offset of input fmt str
+    :param target_addr:   the address to write
+    :param target_num:    the value to write
+    :param is_zxt:        zero extension or not
+    :param zxt_len:       zero extension to 'zxt_len' bit
     """
     # get the list with bytes num
     num_list = __get_num_list(target_num, is_zxt, zxt_len)

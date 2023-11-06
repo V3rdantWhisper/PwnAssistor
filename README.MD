@@ -17,6 +17,9 @@ Auto tools for pwn, including fmt, heap, and so on.
   - [ ] SROP: generate SROP payload 
 - [ ] shellcode
   - [ ] generate shellcode payload 
-  - [ ] generate shellcode payload with encode 
+  - [ ] generate shellcode payload with encode 1
   - [ ] generate shellcode payload with constraint
-  - 
+- [ ] Sover : use angr to detect valuable attack chain
+  - [x] libc got sover : auto detect which libc got could use to hijack
+  - [ ] FSOP sover : auto detect which file stream could use to hijack
+- [ ] fuzz framework
