@@ -2,3 +2,4 @@ build/
 dist/
 PwnAssistor.egg-info/
 __pycache__/
+.idea/
