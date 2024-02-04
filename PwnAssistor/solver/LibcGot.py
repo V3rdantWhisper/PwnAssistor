@@ -28,6 +28,13 @@ class LibcGotSover:
                 self.got_size = i.header.sh_size
                 self.got_claripy = claripy.BVS(
                     "got_claripy", i.header.sh_size * 8, explicit_name=True)
+        if self.got_claripy is None:
+            for i in self.libc_obj.sections:
+                if i.name == ".got":
+                    self.got_addr = i.header.sh_addr
+                    self.got_size = i.header.sh_size
+                    self.got_claripy = claripy.BVS(
+                        "got_claripy", i.header.sh_size * 8, explicit_name=True)
 
     def __get_symbols(self) -> None:
         for sym_name in self.targets:
@@ -108,7 +115,6 @@ class LibcGotSover:
                     f.write("target name :" + name + "\n\n")
                     f.write("solution state:\n")
                     f.write(output_str)
-
 
 def filter_func(state):
     target_addr = 0x67616c66646e6966

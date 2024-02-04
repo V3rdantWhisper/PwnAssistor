@@ -3,3 +3,7 @@ dist/
 PwnAssistor.egg-info/
 __pycache__/
 .idea/
+*.pyc
+*.pyo
+*.pyd
+*/__pycache__/
