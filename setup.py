@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="PwnAssistor",
-    version="0.2.1",
+    version="0.2.2",
     description="Atool for pwn",
     author="V3rdant",
     long_description=open('README.md').read(),
