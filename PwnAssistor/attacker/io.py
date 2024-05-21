@@ -167,6 +167,9 @@ def house_of_lys_orw(target_addr: int, file_name: bytes = b'flag'):
     )
     return payload
 
+def house_of_lys_orw_by_shellcode(target_addr: int):
+    pass
+
 
 def get_IO_obstack_jumps():
     for i in pwnvar.pwnlibc.sections:
