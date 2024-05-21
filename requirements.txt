@@ -1,1 +1,1 @@
-pwntools~=4
+pwntools
